@@ -1,0 +1,99 @@
+<div data-controller="quick-product">
+  <!-- Modal Overlay -->
+  <div data-quick-product-target="modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
+      <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-xl font-black text-gray-900">Nouveau Produit</h3>
+        <button type="button" data-action="quick-product#close" class="text-gray-400 hover:text-gray-600">
+          <%= heroicon "x-mark", options: { class: "size-6" } %>
+        </button>
+      </div>
+      
+      <%= form_with(model: Produit.new, url: produits_path, format: :json, 
+          data: { 
+            quick_product_target: "form",
+            action: "ajax:success->quick-product#handleSuccess ajax:error->quick-product#handleError" 
+          }, class: "p-8") do |p_form| %>
+        
+        <div class="space-y-4">
+          <div>
+            <%= p_form.label :name, "Nom", class: "block text-xs font-black text-gray-400 uppercase tracking-widest mb-1" %>
+            <%= p_form.text_field :name, required: true, class: "block w-full rounded-xl border-gray-200 focus:ring-green-500" %>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <%= p_form.label :category, "Catégorie", class: "block text-xs font-black text-gray-400 uppercase tracking-widest mb-1" %>
+              <%= p_form.text_field :category, class: "block w-full rounded-xl border-gray-200 focus:ring-green-500" %>
+            </div>
+            <div>
+              <%= p_form.label :udm, "UDM (ex: Kg)", class: "block text-xs font-black text-gray-400 uppercase tracking-widest mb-1" %>
+              <%= p_form.text_field :udm, class: "block w-full rounded-xl border-gray-200 focus:ring-green-500" %>
+            </div>
+          </div>
+          <div>
+            <%= p_form.label :udm_value, "Valeur UDM (ex: 500g)", class: "block text-xs font-black text-gray-400 uppercase tracking-widest mb-1" %>
+            <%= p_form.text_field :udm_value, class: "block w-full rounded-xl border-gray-200 focus:ring-green-500" %>
+          </div>
+        </div>
+
+        <div class="mt-8 flex gap-3">
+          <%= p_form.submit "Créer le produit", class: "flex-1 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-lg transition-all" %>
+          <button type="button" data-action="quick-product#close" class="px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all">Annuler</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with(model: liste_de_prix, class: "contents") do |form| %>
+    <% if liste_de_prix.errors.any? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2 class="font-bold"><%= pluralize(liste_de_prix.errors.count, "erreur") %> ont empêché l'enregistrement :</h2>
+        <ul class="list-disc ml-6">
+          <% liste_de_prix.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="my-10 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+      <div class="mb-8 pb-8 border-b border-gray-50">
+        <%= form.label :supermarche_id, "Supermarché concerné", class: "block font-black text-gray-900 uppercase tracking-widest text-sm mb-2" %>
+        <%= form.collection_select :supermarche_id, Supermarche.all, :id, :name, { prompt: "Sélectionnez un supermarché" }, class: "block shadow-sm rounded-xl border border-gray-200 px-4 py-3 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all font-bold text-gray-700" %>
+      </div>
+
+      <div data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-fields">
+        <template data-nested-form-target="template">
+          <%= form.fields_for :liste_de_prix_items, ListeDePrixItem.new, child_index: 'NEW_RECORD' do |f| %>
+            <%= render "liste_de_prix_item_fields", f: f %>
+          <% end %>
+        </template>
+
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-4">
+            <h3 class="font-black text-xl text-gray-900">Produits et Tarifs</h3>
+            <button type="button" data-action="quick-product#open" class="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-xs font-bold hover:bg-green-100 transition-all">
+              <%= heroicon "sparkles", options: { class: "size-4" } %>
+              <span>Créer nouveau produit</span>
+            </button>
+          </div>
+          <button type="button" data-action="nested-form#add" class="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-600 rounded-xl font-bold hover:bg-green-100 transition-all">
+            <%= heroicon "plus-circle", options: { class: "size-5" } %>
+            <span>Ajouter un produit</span>
+          </button>
+        </div>
+
+        <div data-nested-form-target="container">
+          <%= form.fields_for :liste_de_prix_items do |f| %>
+            <%= render "liste_de_prix_item_fields", f: f %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-4">
+      <%= form.submit "Enregistrer la liste", class: "rounded-xl py-4 px-10 bg-green-600 text-white font-black shadow-lg hover:bg-green-700 hover:shadow-xl transform hover:-translate-y-0.5 transition-all cursor-pointer" %>
+      <%= link_to "Annuler", liste_de_prixes_path, class: "rounded-xl py-4 px-10 bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-all" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  liste_de_prix: one
+  produit: one
+  price: 9.99
+  start_date: 2026-01-25
+  end_date: 2026-01-25
+  discount: 9.99
+  discount_type: MyString
+  discount_quantity: 1
+
+two:
+  liste_de_prix: two
+  produit: two
+  price: 9.99
+  start_date: 2026-01-25
+  end_date: 2026-01-25
+  discount: 9.99
+  discount_type: MyString
+  discount_quantity: 1

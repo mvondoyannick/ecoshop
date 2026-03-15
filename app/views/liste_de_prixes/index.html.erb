@@ -1,0 +1,96 @@
+<div class="w-full">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex justify-between items-center mb-10">
+    <h1 class="font-black text-4xl text-gray-900 tracking-tight">Liste des Tarifs</h1>
+    <%= link_to new_liste_de_prix_path, class: "flex items-center gap-2 rounded-xl py-3 px-6 bg-blue-600 text-white font-bold shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all" do %>
+      <%= heroicon "plus", options: { class: "w-5 h-5" } %>
+      <span>Nouveau Tarif</span>
+    <% end %>
+  </div>
+
+  <div class="overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Supermarché</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Produits</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Statut</th>
+          <% if current_user.admin? %>
+            <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Enregistré par</th>
+          <% end %>
+          <th class="px-6 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @liste_de_prixes.each do |liste_de_prix| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <% if liste_de_prix.supermarche.logo.attached? %>
+                  <%= image_tag liste_de_prix.supermarche.logo, class: "w-8 h-8 rounded-lg object-cover" %>
+                <% end %>
+                <div class="text-sm font-bold text-gray-900"><%= liste_de_prix.supermarche.name %></div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex flex-wrap gap-1">
+                <% liste_de_prix.liste_de_prix_items.limit(3).each do |item| %>
+                  <span class="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[10px] font-bold"><%= item.produit.name %></span>
+                <% end %>
+                <% if liste_de_prix.liste_de_prix_items.count > 3 %>
+                  <span class="text-[10px] text-gray-400 font-bold ml-1">+<%= liste_de_prix.liste_de_prix_items.count - 3 %></span>
+                <% end %>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if liste_de_prix.active? %>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-green-100 text-green-700 flex items-center gap-1 w-fit">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                  Active
+                </span>
+              <% else %>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gray-100 text-gray-500 w-fit">
+                  Inactive
+                </span>
+              <% end %>
+            </td>
+            <% if current_user.admin? %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-xs text-gray-900 font-bold"><%= liste_de_prix.user&.name || "N/A" %></div>
+                <div class="text-[10px] text-gray-400"><%= liste_de_prix.societe&.name %></div>
+              </td>
+            <% end %>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <div class="flex justify-end gap-2">
+                <% unless liste_de_prix.active? %>
+                  <%= button_to activate_liste_de_prix_path(liste_de_prix), method: :patch, title: "Activer cette liste", class: "p-2 text-gray-400 hover:text-green-600 transition-colors" do %>
+                    <%= heroicon "check-circle", options: { class: "w-5 h-5" } %>
+                  <% end %>
+                <% end %>
+                <%= link_to liste_de_prix, title: "Gérer les produits", class: "p-2 text-gray-400 hover:text-blue-600 transition-colors" do %>
+                  <%= heroicon "list-bullet", options: { class: "w-5 h-5" } %>
+                <% end %>
+                <%= link_to edit_liste_de_prix_path(liste_de_prix), title: "Modifier", class: "p-2 text-gray-400 hover:text-indigo-600 transition-colors" do %>
+                  <%= heroicon "pencil-square", options: { class: "w-5 h-5" } %>
+                <% end %>
+                <%= button_to liste_de_prix, method: :delete, title: "Supprimer", class: "p-2 text-gray-400 hover:text-red-600 transition-colors", data: { turbo_confirm: "La liste sera supprimée. Continuer ?" } do %>
+                  <%= heroicon "trash", options: { class: "w-5 h-5" } %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @liste_de_prixes.empty? %>
+      <div class="text-center py-20 bg-white">
+        <%= heroicon "currency-dollar", options: { class: "w-16 h-16 mx-auto text-gray-200 mb-4" } %>
+        <h3 class="text-xl font-bold text-gray-900">Aucun tarif</h3>
+        <p class="text-gray-500 mt-2">Associez des produits et des prix à vos supermarchés.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

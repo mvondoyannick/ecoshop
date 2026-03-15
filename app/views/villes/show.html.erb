@@ -1,0 +1,15 @@
+<div class="mx-auto md:w-2/3 w-full flex flex-col gap-6">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <%= render @ville %>
+
+  <div class="flex gap-4 items-center">
+    <%= link_to "Edit this ville", edit_ville_path(@ville), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium hover:bg-gray-200 transition" %>
+    <%= link_to "Back to villes", villes_path, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium hover:bg-gray-200 transition" %>
+    <div class="mt-2">
+      <%= button_to "Destroy this ville", @ville, method: :delete, class: "rounded-lg py-3 px-5 bg-red-600 text-white font-medium hover:bg-red-700 transition" %>
+    </div>
+  </div>
+</div>

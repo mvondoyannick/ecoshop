@@ -1,0 +1,26 @@
+<div class="w-full max-w-5xl mx-auto">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex items-center gap-4 mb-8">
+    <%= link_to supermarches_path, class: "p-2 bg-gray-100 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors" do %>
+      <%= heroicon "chevron-left", options: { class: "w-6 h-6" } %>
+    <% end %>
+    <h1 class="font-black text-4xl text-gray-900 tracking-tight">Détails du Supermarché</h1>
+  </div>
+
+  <%= render @supermarch %>
+
+  <div class="mt-8 flex gap-4">
+    <%= link_to edit_supermarch_path(@supermarch), class: "flex items-center gap-2 rounded-xl py-3 px-8 bg-green-600 text-white font-bold shadow-lg hover:bg-green-700 hover:shadow-xl transition-all" do %>
+      <%= heroicon "pencil-square", options: { class: "w-5 h-5" } %>
+      <span>Modifier</span>
+    <% end %>
+    
+    <%= button_to @supermarch, method: :delete, class: "flex items-center gap-2 rounded-xl py-3 px-8 bg-red-50 text-red-600 font-bold border border-red-100 hover:bg-red-100 transition-all", data: { turbo_confirm: "Êtes-vous sûr ?" } do %>
+      <%= heroicon "trash", options: { class: "w-5 h-5" } %>
+      <span>Supprimer</span>
+    <% end %>
+  </div>
+</div>

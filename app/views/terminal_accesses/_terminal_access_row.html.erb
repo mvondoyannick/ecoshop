@@ -1,0 +1,67 @@
+<tr id="<%= dom_id access %>" class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+  <td class="px-6 py-4 whitespace-nowrap">
+    <div class="text-xs font-bold text-gray-900 dark:text-white"><%= l access.created_at, format: :short %></div>
+    <div class="text-[10px] text-gray-400"><%= time_ago_in_words(access.created_at) %></div>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <button type="button" data-action="click->terminal-stats#show" data-ip="<%= access.ip_address %>" class="text-left group/ip">
+      <div class="text-sm font-black text-gray-900 dark:text-white group-hover/ip:text-blue-600 transition-colors"><%= access.ip_address %></div>
+      <div class="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+        <%= heroicon "globe-alt", options: { class: "size-3" } %>
+        <%= access.country || "Inconnu" %>
+      </div>
+    </button>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <div class="text-xs font-medium text-blue-600 dark:text-blue-400 truncate max-w-[200px]" title="<%= access.url %>">
+      <%= access.url.sub(request.base_url, "") %>
+    </div>
+  </td>
+  <td class="px-6 py-4">
+    <div class="flex flex-col gap-0.5">
+      <div class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tighter flex items-center gap-1.5">
+        <% icon = case access.device_type&.downcase 
+           when 'smartphone' then 'device-phone-mobile'
+           when 'tablet' then 'device-tablet'
+           else 'computer-desktop'
+           end %>
+        <%= heroicon icon, options: { class: "size-3 text-gray-400" } %>
+        <%= [access.device_brand, access.device_model].compact_blank.join(" ") %>
+        <%= "Terminal Inconnu" if [access.device_brand, access.device_model].compact_blank.empty? %>
+      </div>
+      <% if access.device_type.present? %>
+        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest"><%= access.device_type %></div>
+      <% end %>
+      <div class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-1 max-w-[200px]" title="<%= access.user_agent %>">
+        <%= access.user_agent %>
+      </div>
+    </div>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <% if access.blocked? %>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ring-red-600/10 dark:ring-red-400/20">
+        <span class="size-1.5 rounded-full bg-red-500 animate-pulse"></span>
+        Bloqué
+      </span>
+    <% else %>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ring-green-600/10 dark:ring-green-400/20">
+        <span class="size-1.5 rounded-full bg-green-500"></span>
+        Autorisé
+      </span>
+    <% end %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <div class="flex justify-end gap-2">
+      <%= button_to toggle_block_terminal_access_path(access), method: :patch, 
+          class: "p-2 rounded-lg transition-all #{access.blocked? ? 'bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400' : 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400'}", 
+          title: access.blocked? ? "Débloquer" : "Bloquer" do %>
+        <%= heroicon access.blocked? ? "lock-open" : "lock-closed", options: { class: "size-5" } %>
+      <% end %>
+      
+      <%= button_to access, method: :delete, data: { turbo_confirm: "Supprimer ce log ?" }, 
+          class: "p-2 bg-gray-50 dark:bg-white/[0.05] text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.1] hover:text-red-600 transition-all" do %>
+        <%= heroicon "trash", options: { class: "size-5" } %>
+      <% end %>
+    </div>
+  </td>
+</tr>

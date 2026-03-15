@@ -1,0 +1,108 @@
+<div class="w-full" data-controller="terminal-stats">
+<div class="contents" data-controller="realtime-logs">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+
+
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-10 gap-6">
+    <div>
+      <h1 class="font-black text-4xl text-gray-900 dark:text-white tracking-tight">Accès Terminaux</h1>
+      <p class="text-gray-500 font-medium">Historique des requêtes et gestion de la sécurité</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <!-- Requests Summary -->
+      <div class="grid grid-cols-4 gap-2 bg-white dark:bg-gray-800 p-2 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
+        <% @requests_by_day.first(4).each do |date, count| %>
+          <div class="flex flex-col items-center px-3 py-1 border-r last:border-0 border-gray-100 dark:border-white/5">
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter"><%= date.strftime("%d/%m") %></span>
+            <span class="text-xs font-black text-gray-900 dark:text-white"><%= count %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Real-time Toggle -->
+      <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-2 pl-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm h-full">
+        <div class="flex flex-col">
+          <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Direct</span>
+          <span data-realtime-logs-target="indicator" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500 text-white text-center transition-colors">ON</span>
+        </div>
+        <button type="button" data-action="realtime-logs#toggle" data-realtime-logs-target="toggleButton" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 bg-green-600" role="switch" aria-checked="true">
+          <span class="sr-only">Toggle Real-time</span>
+          <span aria-hidden="true" data-realtime-logs-target="toggleCircle" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Stream Source -->
+  <div data-realtime-logs-target="streamContainer" data-stream-name="<%= Turbo::StreamsChannel.signed_stream_name(:terminal_accesses) %>">
+    <%= turbo_stream_from :terminal_accesses %>
+  </div>
+
+  <div class="overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-white/5">
+        <thead class="bg-gray-50 dark:bg-gray-900/50">
+          <tr>
+            <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Heure</th>
+            <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">IP & Pays</th>
+            <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Endpoint</th>
+            <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Terminal</th>
+            <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Statut</th>
+            <th class="px-6 py-4 text-right text-xs font-black text-gray-400 uppercase tracking-widest">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="terminal_accesses_list" class="divide-y divide-gray-100 dark:divide-white/5">
+          <% if @terminal_accesses.any? %>
+            <% @terminal_accesses.each do |access| %>
+              <%= render "terminal_access_row", access: access %>
+            <% end %>
+          <% else %>
+            <tr id="empty_state">
+              <td colspan="6" class="px-6 py-20 text-center">
+                <div class="flex flex-col items-center gap-3">
+                  <div class="p-4 bg-gray-50 dark:bg-white/[0.02] rounded-full">
+                    <%= heroicon "shield-check", options: { class: "size-8 text-gray-300" } %>
+                  </div>
+                  <p class="text-gray-500 font-medium">Aucun accès enregistré pour le moment.</p>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+  <!-- Terminal Stats Modal -->
+  <div data-terminal-stats-target="modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all border border-gray-100 dark:border-white/10">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
+        <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Détails du Terminal</h3>
+        <button type="button" data-action="terminal-stats#close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <%= heroicon "x-mark", options: { class: "size-5" } %>
+        </button>
+      </div>
+      <div class="p-8 flex flex-col items-center text-center">
+        <div class="size-16 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mb-4">
+          <%= heroicon "computer-desktop", options: { class: "size-8 text-blue-600 dark:text-blue-400" } %>
+        </div>
+        <div data-terminal-stats-target="ipDisplay" class="text-xl font-black text-gray-900 dark:text-white mb-1">...</div>
+        <p class="text-xs text-gray-500 font-medium uppercase tracking-widest mb-6">Adresse IP</p>
+        
+        <div class="grid grid-cols-1 w-full bg-gray-50 dark:bg-white/[0.02] rounded-2xl p-4">
+          <div class="flex flex-col">
+            <span data-terminal-stats-target="countDisplay" class="text-3xl font-black text-green-600 dark:text-green-400">...</span>
+            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Connexions Totales</span>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 flex justify-center">
+        <button type="button" data-action="terminal-stats#close" class="text-xs font-black text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 uppercase tracking-widest">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

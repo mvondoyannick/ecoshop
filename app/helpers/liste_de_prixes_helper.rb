@@ -1,0 +1,2 @@
+module ListeDePrixesHelper
+end

@@ -1,0 +1,33 @@
+<div class="w-full">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex justify-between items-center mb-10">
+    <h1 class="font-bold text-4xl">Villes</h1>
+    <div class="flex items-center gap-4">
+      <div class="inline-flex rounded-md shadow-sm" role="group">
+        <%= link_to villes_path(view: 'list'), class: "flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 #{@view == 'list' ? 'bg-gray-100 text-blue-700' : 'bg-white text-gray-900'}" do %>
+          <%= heroicon "list-bullet", options: { class: "w-4 h-4" } %>
+          <span>Liste</span>
+        <% end %>
+        <%= link_to villes_path(view: 'kanban'), class: "flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 #{@view == 'kanban' ? 'bg-gray-100 text-blue-700' : 'bg-white text-gray-900'}" do %>
+          <%= heroicon "view-columns", options: { class: "w-4 h-4" } %>
+          <span>Kanban</span>
+        <% end %>
+      </div>
+      <%= link_to new_ville_path, class: "flex items-center gap-2 rounded-lg py-2 px-5 bg-blue-600 text-white block font-medium hover:bg-blue-700 transition" do %>
+        <%= heroicon "plus", options: { class: "w-5 h-5" } %>
+        <span>New ville</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div id="villes_container">
+    <% if @view == 'kanban' %>
+      <%= render "kanban", villes: @villes %>
+    <% else %>
+      <%= render "list", villes: @villes %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="w-full">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+    <div class="flex items-center gap-6">
+      <h1 class="font-black text-4xl text-gray-900 tracking-tight">Supermarchés</h1>
+      <div class="inline-flex rounded-xl shadow-sm bg-gray-100 p-1" role="group">
+        <%= link_to supermarches_path(view: 'list'), class: "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all #{@view == 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}" do %>
+          <%= heroicon "list-bullet", options: { class: "w-4 h-4" } %>
+          <span>Liste</span>
+        <% end %>
+        <%= link_to supermarches_path(view: 'kanban'), class: "flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all #{@view == 'kanban' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}" do %>
+          <%= heroicon "view-columns", options: { class: "w-4 h-4" } %>
+          <span>Kanban</span>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="flex flex-wrap gap-3">
+      <%= link_to supermarches_path(format: :xls), class: "flex items-center gap-2 rounded-xl py-3 px-5 bg-green-50 text-green-700 font-bold border border-green-100 hover:bg-green-100 transition-all shadow-sm" do %>
+        <%= heroicon "arrow-down-tray", options: { class: "w-5 h-5" } %>
+        <span>Exporter</span>
+      <% end %>
+
+      <%= form_tag import_supermarches_path, multipart: true, class: "flex items-center" do %>
+        <label class="flex items-center gap-2 rounded-xl py-3 px-5 bg-gray-50 text-gray-700 font-bold border border-gray-100 hover:bg-gray-100 transition-all shadow-sm cursor-pointer border-dashed border-2">
+          <%= heroicon "arrow-up-tray", options: { class: "w-5 h-5 text-gray-400" } %>
+          <span>Importer XLS</span>
+          <%= file_field_tag :file, class: "hidden", onchange: "this.form.submit();" %>
+        </label>
+      <% end %>
+
+      <%= link_to new_supermarch_path, class: "flex items-center gap-2 rounded-xl py-3 px-6 bg-blue-600 text-white font-bold shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all" do %>
+        <%= heroicon "plus", options: { class: "w-5 h-5" } %>
+        <span>Nouveau</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div id="supermarches_container">
+    <% if @supermarches.any? %>
+      <% if @view == 'kanban' %>
+        <%= render "kanban", supermarches: @supermarches %>
+      <% else %>
+        <%= render "list", supermarches: @supermarches %>
+      <% end %>
+    <% else %>
+      <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+        <%= heroicon "building-storefront", options: { class: "w-16 h-16 mx-auto text-gray-300 mb-4" } %>
+        <h3 class="text-xl font-bold text-gray-900">Aucun supermarché</h3>
+        <p class="text-gray-500 mt-2">Commencez par ajouter votre premier point de vente.</p>
+        <%= link_to "Ajouter un supermarché", new_supermarch_path, class: "mt-6 inline-flex text-blue-600 font-bold hover:underline" %>
+      </div>
+    <% end %>
+  </div>
+</div>

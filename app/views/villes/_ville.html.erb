@@ -1,0 +1,26 @@
+<div id="<%= dom_id ville %>" class="bg-white rounded-lg shadow-md overflow-hidden">
+  <table class="w-full">
+    <tbody class="divide-y divide-gray-200">
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-6 py-4 text-sm font-medium text-gray-900 bg-gray-50 w-1/3">Name</td>
+        <td class="px-6 py-4 text-sm text-gray-700">
+          <%= ville.name %>
+        </td>
+      </tr>
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-6 py-4 text-sm font-medium text-gray-900 bg-gray-50 w-1/3">Code</td>
+        <td class="px-6 py-4 text-sm text-gray-700">
+          <%= ville.code %>
+        </td>
+      </tr>
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-6 py-4 text-sm font-medium text-gray-900 bg-gray-50 w-1/3">Statut</td>
+        <td class="px-6 py-4 text-sm text-gray-700">
+          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_color(ville.status) %>">
+            <%= ville.status %>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

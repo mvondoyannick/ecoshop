@@ -1,0 +1,113 @@
+<div class="w-full">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="flex items-center justify-between mb-8 gap-4">
+    <div class="flex items-center gap-4">
+      <%= link_to liste_de_prixes_path, class: "p-2 bg-gray-100 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors" do %>
+        <%= heroicon "chevron-left", options: { class: "size-6" } %>
+      <% end %>
+      <div>
+        <h1 class="font-black text-4xl text-gray-900 tracking-tight"><%= @liste_de_prix.supermarche.name %></h1>
+        <p class="text-gray-500 font-medium">Liste des tarifs et promotions</p>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <% if @liste_de_prix.active? %>
+        <div class="flex items-center gap-2 px-4 py-3 bg-green-50 text-green-700 rounded-xl border border-green-100">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <span class="text-xs font-black uppercase tracking-widest">Liste Active</span>
+        </div>
+      <% else %>
+        <%= button_to activate_liste_de_prix_path(@liste_de_prix), method: :patch, class: "flex items-center gap-2 rounded-xl py-3 px-6 bg-green-600 text-white font-bold shadow-lg hover:bg-green-700 transition-all" do %>
+          <%= heroicon "check-circle", options: { class: "size-5" } %>
+          <span>Activer</span>
+        <% end %>
+      <% end %>
+      
+      <%= link_to edit_liste_de_prix_path(@liste_de_prix), class: "flex items-center gap-2 rounded-xl py-3 px-6 bg-green-600 text-white font-bold shadow-lg hover:bg-green-700 transition-all" do %>
+        <%= heroicon "pencil-square", options: { class: "size-5" } %>
+        <span>Modifier</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="overflow-hidden bg-white rounded-3xl shadow-sm border border-gray-100">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Image</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Produit</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Format</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Prix</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Promotion</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Validité</th>
+          <th class="px-6 py-4 text-left text-xs font-black text-gray-400 uppercase tracking-widest">Etat</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% @liste_de_prix.liste_de_prix_items.each do |item| %>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if item.produit.image.attached? %>
+                <%= image_tag item.produit.image.variant(resize_to_fill: [64, 64]), class: "w-16 h-16 rounded-lg object-cover shadow-sm bg-gray-50" %>
+              <% else %>
+                <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-300">
+                  <%= heroicon "photo", options: { class: "size-6" } %>
+                </div>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-bold text-gray-900"><%= item.produit.name %></div>
+              <div class="text-[10px] text-gray-400 uppercase tracking-widest font-black"><%= item.produit.category %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500"><%= item.produit.udm_value %> (<%= item.produit.udm %>)</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-black text-gray-900"><%= number_to_currency(item.price, unit: "CFA ", precision: 0, format: "%n %u") %></div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if item.discount.present? && item.discount > 0 %>
+                <div class="inline-flex items-center px-2.5 py-1 rounded-lg bg-red-50 text-red-700 text-xs font-bold gap-1">
+                  <%= heroicon "sparkles", options: { class: "size-3" } %>
+                  -<%= item.discount %><%= item.discount_type == 'Pourcentage' ? '%' : ' CFA' %>
+                  <% if item.discount_quantity.present? && item.discount_quantity > 1 %>
+                    <span class="text-[10px] opacity-70 ml-1">(Min. <%= item.discount_quantity %>)</span>
+                  <% end %>
+                </div>
+              <% else %>
+                <span class="text-gray-300 text-xs">—</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-[11px] text-gray-500 font-medium">
+                <div>Du <%= l item.start_date, format: :short %></div>
+                <% if item.end_date.present? %>
+                  <div>Au <%= l item.end_date, format: :short %></div>
+                <% end %>
+                <% if item.expiration_date.present? %>
+                  <div class="mt-1 text-orange-600 font-bold">Expire le <%= l item.expiration_date, format: :short %></div>
+                <% end %>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if item.perime? %>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-red-700 text-[10px] font-bold ring-1 ring-inset ring-red-600/10 uppercase tracking-wider">
+                  <span class="size-1.5 rounded-full bg-red-500"></span>
+                  Périmé
+                </span>
+              <% else %>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-[10px] font-bold ring-1 ring-inset ring-green-600/10 uppercase tracking-wider">
+                  <span class="size-1.5 rounded-full bg-green-500"></span>
+                  Bon état
+                </span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

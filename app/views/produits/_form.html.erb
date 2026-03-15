@@ -1,0 +1,112 @@
+<%= form_with(model: produit, class: "contents") do |form| %>
+  <% if produit.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+      <h2 class="font-bold"><%= pluralize(produit.errors.count, "erreur") %> ont empêché l'enregistrement :</h2>
+      <ul class="list-disc ml-6">
+        <% produit.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+    <!-- Section Informations Générales -->
+    <div class="space-y-6">
+      <h3 class="text-lg font-bold text-gray-900 border-b pb-2">Informations Générales</h3>
+      
+      <div>
+        <%= form.label :name, "Nom du produit", class: "block font-semibold text-gray-700 mb-1" %>
+        <%= form.text_field :name, placeholder: "ex: Lait de vache", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all" %>
+      </div>
+
+      <div>
+        <%= form.label :category, "Catégorie", class: "block font-semibold text-gray-700 mb-1" %>
+        <%= form.text_field :category, placeholder: "ex: Cremerie", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all" %>
+      </div>
+
+      <div>
+        <%= form.label :sku, "SKU (Référence)", class: "block font-semibold text-gray-700 mb-1" %>
+        <%= form.text_field :sku, placeholder: "Laisser vide pour générer auto", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all" %>
+        <p class="text-xs text-gray-500 mt-1">Sera généré automatiquement si vide</p>
+      </div>
+
+      <div>
+        <%= form.label :image, "Image du produit", class: "block font-semibold text-gray-700 mb-1" %>
+        <%= form.file_field :image, class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" %>
+      </div>
+    </div>
+
+    <!-- Section Détails -->
+    <div class="space-y-6">
+      <h3 class="text-lg font-bold text-gray-900 border-b pb-2">Détails Techniques</h3>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= form.label :udm, "Unité (UDM)", class: "block font-semibold text-gray-700 mb-1" %>
+          <%= form.text_field :udm, placeholder: "ex: Litres", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all" %>
+        </div>
+
+        <div>
+          <%= form.label :udm_value, "Valeur", class: "block font-semibold text-gray-700 mb-1" %>
+          <%= form.text_field :udm_value, placeholder: "ex: 1", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-green-500 focus:border-green-500 transition-all" %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+    <!-- Section Promotion -->
+    <div class="space-y-6 p-6 bg-yellow-50 rounded-xl border border-yellow-100" data-controller="promotions">
+      <div class="flex items-center justify-between border-b border-yellow-200 pb-2">
+        <h3 class="text-lg font-bold text-yellow-800">Promotion</h3>
+        <label class="inline-flex items-center cursor-pointer">
+          <%= form.check_box :promotion, data: { promotions_target: "checkbox", action: "change->promotions#toggle" }, class: "sr-only peer" %>
+          <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-400"></div>
+          <span class="ms-3 text-sm font-medium text-yellow-900">Activer</span>
+        </label>
+      </div>
+
+      <div data-promotions-target="content" class="hidden space-y-4">
+        <div>
+          <%= form.label :promotion_price, "Prix promotionnel", class: "block font-semibold text-gray-700 mb-1" %>
+          <%= form.number_field :promotion_price, step: "0.01", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-yellow-500 focus:border-yellow-500 transition-all" %>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <%= form.label :promotion_start_date, "Date début", class: "block font-semibold text-gray-700 mb-1" %>
+            <%= form.date_field :promotion_start_date, class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-yellow-500 focus:border-yellow-500 transition-all" %>
+          </div>
+          <div>
+            <%= form.label :promotion_end_date, "Date fin", class: "block font-semibold text-gray-700 mb-1" %>
+            <%= form.date_field :promotion_end_date, class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-yellow-500 focus:border-yellow-500 transition-all" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Vente en gros -->
+    <div class="space-y-6 p-6 bg-blue-50 rounded-xl border border-blue-100">
+      <h3 class="text-lg font-bold text-blue-800 border-b border-blue-200 pb-2">Vente en Gros</h3>
+      
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= form.label :bulk_sale_quantity, "Qté min. pour réduction", class: "block font-semibold text-gray-700 mb-1 text-sm" %>
+          <%= form.number_field :bulk_sale_quantity, placeholder: "ex: 10", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-blue-500 focus:border-blue-500 transition-all" %>
+        </div>
+
+        <div>
+          <%= form.label :bulk_sale_discount_percentage, "% de réduction", class: "block font-semibold text-gray-700 mb-1 text-sm" %>
+          <%= form.number_field :bulk_sale_discount_percentage, step: "0.01", placeholder: "ex: 5", class: "block shadow-sm rounded-lg border border-gray-300 px-4 py-2 mt-1 w-full focus:ring-blue-500 focus:border-blue-500 transition-all" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-10 flex gap-4">
+    <%= form.submit "Enregistrer le produit", class: "rounded-lg py-3 px-8 bg-green-600 text-white font-bold shadow-lg hover:bg-green-700 hover:shadow-xl transform hover:-translate-y-0.5 transition-all cursor-pointer" %>
+    <%= link_to "Annuler", produits_path, class: "rounded-lg py-3 px-8 bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-all" %>
+  </div>
+<% end %>

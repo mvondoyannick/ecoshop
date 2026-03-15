@@ -1,0 +1,99 @@
+<div class="flex gap-6 overflow-x-auto pb-6">
+  <% 
+    statuses = Supermarche::STATUSES
+    statuses = statuses.reject { |s| s == "Pending" } unless current_user.admin?
+    statuses.each do |status| 
+  %>
+    <div class="flex-shrink-0 w-80 bg-gray-50/50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-4">
+      <div class="flex items-center justify-between px-2">
+        <h3 class="font-black text-gray-900 flex items-center gap-2">
+          <% color_dot = case status when "Pending" then "bg-blue-500" when "Actif" then "bg-green-500" when "Suspendu" then "bg-yellow-500" when "Archivé" then "bg-gray-400" end %>
+          <span class="w-2.5 h-2.5 rounded-full <%= color_dot %>"></span>
+          <%= status %>
+        </h3>
+        <span class="bg-white px-2 py-0.5 rounded-lg border border-gray-100 text-xs font-black text-gray-400 shadow-sm">
+          <%= supermarches.select { |s| s.status == status }.count %>
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-4 min-h-[500px]">
+        <% supermarches.select { |s| s.status == status }.each do |supermarche| %>
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer group relative">
+            <div class="flex items-start gap-4 mb-4">
+              <% if supermarche.logo.attached? %>
+                <%= image_tag supermarche.logo, class: "w-12 h-12 rounded-xl object-cover shadow-sm" %>
+              <% else %>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xl shadow-sm">
+                  <%= supermarche.name[0] %>
+                </div>
+              <% end %>
+              <div class="flex-1">
+                <h4 class="font-bold text-gray-900 leading-tight group-hover:text-blue-600 transition-colors"><%= supermarche.name %></h4>
+                <p class="text-xs text-gray-400 mt-1 font-mono">CODE: <%= supermarche.code %></p>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2 text-xs text-gray-500">
+                <%= heroicon "map-pin", options: { class: "w-3.5 h-3.5 text-gray-300" } %>
+                <span class="truncate"><%= supermarche.ville&.name %>, <%= supermarche.quartier %></span>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-gray-500">
+                <%= heroicon "phone", options: { class: "w-3.5 h-3.5 text-gray-300" } %>
+                <span><%= supermarche.phone %></span>
+              </div>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wider">
+                <%= heroicon "document-text", options: { class: "w-3 h-3" } %>
+                <%= supermarche.liste_de_prix.count %> listes
+              </span>
+              <span class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-wider">
+                <%= heroicon "shopping-cart", options: { class: "w-3 h-3" } %>
+                <%= supermarche.liste_de_prix_items.count %> produits
+              </span>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-gray-50 flex justify-between items-center">
+              <div class="flex gap-2">
+                <%= link_to supermarche, title: "Détails", class: "p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-blue-600 transition-all" do %>
+                  <%= heroicon "eye", options: { class: "w-4 h-4" } %>
+                <% end %>
+                <%= link_to edit_supermarch_path(supermarche), title: "Modifier", class: "p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-indigo-600 transition-all" do %>
+                  <%= heroicon "pencil-square", options: { class: "w-4 h-4" } %>
+                <% end %>
+              </div>
+              
+              <div class="flex gap-1 group/actions">
+                <% if supermarche.status == "Actif" %>
+                  <%= button_to suspend_supermarch_path(supermarche), method: :patch, title: "Suspendre", class: "p-2 hover:bg-yellow-50 rounded-lg text-yellow-400 hover:text-yellow-600 transition-all" do %>
+                    <%= heroicon "pause-circle", options: { class: "w-5 h-5" } %>
+                  <% end %>
+                <% else %>
+                  <%= button_to reactivate_supermarch_path(supermarche), method: :patch, title: "Réactiver", class: "p-2 hover:bg-green-50 rounded-lg text-green-400 hover:text-green-600 transition-all" do %>
+                    <%= heroicon "play-circle", options: { class: "w-5 h-5" } %>
+                  <% end %>
+                <% end %>
+                <% if supermarche.status != "Archivé" %>
+                  <%= button_to archive_supermarch_path(supermarche), method: :patch, title: "Archiver", class: "p-2 hover:bg-red-50 rounded-lg text-red-400 hover:text-red-600 transition-all" do %>
+                    <%= heroicon "archive-box", options: { class: "w-5 h-5" } %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <% if supermarches.select { |s| s.status == status }.empty? %>
+          <div class="border-2 border-dashed border-gray-100 rounded-3xl p-10 flex flex-col items-center justify-center text-center">
+            <div class="text-gray-200">
+              <%= heroicon "inbox", options: { class: "w-10 h-10 mb-2" } %>
+            </div>
+            <p class="text-xs font-bold text-gray-300 uppercase tracking-widest">Aucun</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
