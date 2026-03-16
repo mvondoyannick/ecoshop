@@ -1,0 +1,16 @@
+.git
+/log
+/tmp
+/test
+/spec
+/node_modules
+.ruby-lsp
+Dockerfile
+.dockerignore
+.gitignore
+.gitattributes
+.ruby-version
+README.md
+vendor/bundle
+storage/*
+!storage/.keep

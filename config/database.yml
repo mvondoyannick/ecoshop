@@ -85,7 +85,4 @@ test:
 #
 production:
   <<: *default
-  database: blog_production
-  username: blog
-  password: <%= ENV["BLOG_DATABASE_PASSWORD"] %>
-# echo $DATABASE_URL postgresql://postgres.lpozisyifltvexlzhaeq:cUCQ2EpjuwxQ7Uc7@aws-1-eu-west-1.pooler.supabase.com:6543/postgres
+

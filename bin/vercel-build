@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Precompile assets
+RAILS_ENV=production bundle exec rake assets:precompile
+
+# If you have migrations to run:
+# RAILS_ENV=production bundle exec rake db:migrate
